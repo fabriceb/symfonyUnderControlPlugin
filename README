@@ -1,0 +1,29 @@
+# symfonyUnderControl plugin #
+
+The symfonyUnderControl plugin enables your symfony project to be run through the phpUnderControl (http://phpundercontrol.org) Continuous Integration environment. This can be used for automated unit testing, documentation generation, code coverage checks and even deployment to testing, staging or production environments.
+
+Setting up a phpUnderControl environment is relatively easy, but it requires you have or install the following:
+
+  * Java
+  * CruiseControl
+  * phpUnderControl
+
+For additional functionality, you may also need
+
+  * PHP_CodeSniffer
+  * phpDocumentor
+  * PHPUnit
+
+Obviously, that last one is one we're trying to replace for projects where you use symfonyUnderControlPlugin ;)
+
+There are various tutorials online on how to set up phpUnderControl, I suggest you follow these to get the environment up and running. It is beyond the scope of this README to go into that. This README will focus on setting up symfonyUnderControl and configure phpUnderControl to use it for testing.
+
+## Installation ##
+
+  * Install the plugin
+    
+        ./symfony plugin:install symfonyUnderControlPlugin
+    
+  * Configure your project in phpUnderControl
+    * Create a new project in your project directory by either using phpuc.php project or creating the structure yourself
+    
