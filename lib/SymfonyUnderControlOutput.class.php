@@ -1,22 +1,41 @@
 <?php
 
+/**
+ * Class controlling the output of the test results
+ * 
+ * @package symfonyUnderControlPlugin
+ * @author Stefan Koopmanschap <stefan.koopmanschap@symfony-project.com>
+ *
+ */
 class SymfonyUnderControlOutput
 {
   protected $tests = array();
-  protected $current_test;
   protected $path;
   
+  /**
+   * Constructor
+   *
+   * @param string $path path to write the resulting XML to
+   */
   public function __construct($path)
   {
     $this->path = $path;
   }
   
+  /**
+   * Set the current test and add it to the list of tests
+   *
+   * @param SymfonyUnderControlTest $test
+   */
   public function setTest(SymfonyUnderControlTest $test)
   {
-    $this->current_test = $test;
     $this->tests [] = $test;
   }
   
+  /**
+   * Write the XML to the file specified in the constructor
+   *
+   */
   public function writeToFile()
   {
     if (! is_writable($this->path))
@@ -27,6 +46,11 @@ class SymfonyUnderControlOutput
   	file_put_contents($this->path, $xml);
   }
   
+  /**
+   * Build the XML from the test results
+   *
+   * @return string xUnit XML
+   */
   public function buildXML()
   {
   	$xml = '';
