@@ -31,7 +31,7 @@ class SymfonyUnderControlTest
   /**
    * Constructor for a test
    *
-   * @param string $filename path to the file that 
+   * @param string $filename path to the file that contains the test
    */
   public function __construct($filename)
   {
