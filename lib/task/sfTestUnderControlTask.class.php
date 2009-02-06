@@ -1,6 +1,17 @@
 <?php
+/**
+ * Task to execute the symfonyUnderControl testing
+ * 
+ * @package symfonyUnderControlPlugin
+ * @author Stefan Koopmanschap <stefan.koopmanschap@symfony-project.com>
+ *
+ */
 class sfTestUnderControlTask extends sfBaseTask
 {
+	
+	/**
+	 * @see sfTask
+	 */
   protected function configure()
   {
     $this->aliases = array('test-undercontrol');
@@ -23,19 +34,21 @@ them by hand or with the [test:unit|COMMENT] and [test:functional|COMMENT] task.
 EOF;
   }
   
+  /**
+   * @see sfTask
+   */
   protected function execute($arguments = array(), $options = array())
   {
     $output = new SymfonyUnderControlOutput($arguments['path']);
   	$test_dir = sfConfig::get('sf_test_dir');
   	
-  	// register all tests
     $finder = sfFinder::type('file')->follow_link()->name('*Test.php');
 		$tests = $finder->in($test_dir);
 
 		foreach($tests as $test)
 		{
 			$test = new SymfonyUnderControlTest($test);		
-			$test->runTest($output, $test_dir);
+			$test->runTest($output);
 		}
 		
 		$output->writeToFile();
