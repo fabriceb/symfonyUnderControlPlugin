@@ -27,3 +27,10 @@ There are various tutorials online on how to set up phpUnderControl, I suggest y
   * Configure your project in phpUnderControl
     * Create a new project in your project directory by either using phpuc.php project or creating the structure yourself
     
+    
+## TODO ##
+
+  * Split up Functional and Unit tests into seperate Test Suites with seperate handling
+  * Improve Functional Test handling
+  * Improve documentation
+  * Create the output XML the proper way instead of concatenating strings
