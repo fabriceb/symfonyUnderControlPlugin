@@ -58,7 +58,6 @@ class SymfonyUnderControlOutput
       $xml .= '</testcase>';
     }
 
-
     $xml = '<?xml version="1.0" encoding="UTF-8"?>
             <testsuites>
               <testsuite name="All Tests" tests="' . $test_count . '" assertions="' . $assertion_count . '" failures="' . $failure_count . '" errors="0" time="' . $total_time . '"><testsuite name="Unit" file="' . dirname($test->getFilename()) . '" fullPackage="UnderControlTests" category="QualityAssurance" package="UnderControlTests" tests="' . $test_count . '" assertions="' . $assertion_count . '" failures="' . $failure_count . '" errors="0" time="' . $total_time . '">' . "\n" . $xml . '</testsuite>
@@ -67,12 +66,6 @@ class SymfonyUnderControlOutput
     
     $sxml = simplexml_load_string($xml);
     return $sxml->asXml();
-  }
-  
-  public function __call($name, $arguments)
-  {
-    throw new Exception('Method ' . $name . ' not implemented yet');
-    echo $name . ':' . print_r($arguments, 1) . "\n";
   }
 
 }
