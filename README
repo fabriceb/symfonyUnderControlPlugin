@@ -16,17 +16,39 @@ For additional functionality, you may also need
 
 Obviously, that last one is one we're trying to replace for projects where you use symfonyUnderControlPlugin ;)
 
-There are various tutorials online on how to set up phpUnderControl, I suggest you follow these to get the environment up and running. It is beyond the scope of this README to go into that. This README will focus on setting up symfonyUnderControl and configure phpUnderControl to use it for testing.
+There are various tutorials online on how to set up phpUnderControl, such as [this one](http://felix.phpbelgium.be/blog/2009/02/07/setting-up-phpundercontrol/), I suggest you follow these to get the environment up and running. It is beyond the scope of this README to go into that. This README will focus on setting up symfonyUnderControl and configure phpUnderControl to use it for testing.
 
 ## Installation ##
 
   * Install the plugin
     
-        ./symfony plugin:install symfonyUnderControlPlugin
+        ./symfony plugin:install symfonyUnderControlPlugin --release=0.0.1
     
   * Configure your project in phpUnderControl
     * Create a new project in your project directory by either using phpuc.php project or creating the structure yourself
-    
+    * Configure your project's build.xml to use symfonyUnderControl   
+      
+            // build.xml
+            // ...
+            <!-- add clearcache and test to your build target -->
+            <target name="build" depends="clearcache,test"/>
+            <!-- clear the cache because new commits may have added new stuff -->
+            <target name="clearcache">
+              <exec executable="${basedir}/source/trunk/symfony">
+                <arg line=" cc" />
+              </exec>
+            </target>
+            <!-- execute the test:undercontrol task and have it point to the logs directory -->
+            <target name="test">
+              <exec executable="${basedir}/source/trunk/symfony">
+                <arg line=" test:undercontrol ${basedir}/build/logs/undercontrol.xml" />
+              </exec>
+            </target>
+            // ...
+          
+      This is the most important step, because with this you configure the writing of the test output to an XML that can be read by phpUnderControl
+  
+  * Go to your phpUnderControl web interface and see your tests being executed and show up
     
 ## TODO ##
 
@@ -34,3 +56,4 @@ There are various tutorials online on how to set up phpUnderControl, I suggest y
   * Improve Functional Test handling
   * Improve documentation
   * Create the output XML the proper way instead of concatenating strings
+  * Allow for plugin test execution
