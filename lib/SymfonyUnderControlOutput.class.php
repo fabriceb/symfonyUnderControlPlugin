@@ -11,6 +11,7 @@ class SymfonyUnderControlOutput
 {
   protected $tests = array();
   protected $path;
+  protected $xml;
   
   /**
    * Constructor
@@ -43,7 +44,7 @@ class SymfonyUnderControlOutput
       throw new Exception('Path <' . $this->path . '> not writable');
     }
     $xml = $this->buildXML();
-  	file_put_contents($this->path, $xml);
+    file_put_contents($this->path, $xml);
   }
   
   /**
@@ -53,43 +54,93 @@ class SymfonyUnderControlOutput
    */
   public function buildXML()
   {
-  	$xml = '';
-  	
-  	$failure_count = 0;
-  	$test_count = 0;
-  	$assertion_count = 0;
-  	$total_time = 0;
-  	
+    $this->loadBaseXML();
+    
+    $alltests = $this->addTestSuite('All Tests');
+    
+    $failure_count = 0;
+    $test_count = 0;
+    $assertion_count = 0;
+    $total_time = 0;
+    
     foreach ( $this->tests as $test )
     {
-    	$test_count++;
+      $test_count ++;
       $asserts = $test->getAsserts();
-      $xml .= '<testcase name="' . $test->getName() . 'class" file="' . $test->getFilename() . '" assertions="' . $test->getNumberOfAssertions() . '" time="' . $test->getTimeSpent() . '">';
+      
+      $current_suite = $this->addTestSuite($test->getName(), $alltests);
+      
+      $current_case = $this->addTestcase($current_suite, $test->getName());
+      $current_case ['file'] = $test->getFilename();
+      $current_case ['assertions'] = $test->getNumberOfAssertions();
+      $current_case ['time'] = $test->getTimeSpent();
+      
       $assertion_count = $assertion_count + $test->getNumberOfAssertions();
       $total_time = $total_time + $test->getTimeSpent();
       
-      foreach($asserts as $assert_number => $assert)
+      foreach ( $asserts as $assert_number => $assert )
       {
-      	if (!empty($assert_number))
-      	{
-	      	if (false === $assert['status'])
-	      	{
-	      		$failure_count++;
-	      		$xml .= '<failure type="UnderControlFailure"><![CDATA[' . $assert['comment'] . ']]></failure>' . "\n";
-	      	}
-      	}
+        if (! empty($assert_number))
+        {
+          if (false === $assert ['status'])
+          {
+            $failure_count ++;
+            $this->addFailure($current_case, $assert ['comment']);
+          }
+        }
       }
-      $xml .= '</testcase>';
     }
-
-    $xml = '<?xml version="1.0" encoding="UTF-8"?>
-            <testsuites>
-              <testsuite name="All Tests" tests="' . $test_count . '" assertions="' . $assertion_count . '" failures="' . $failure_count . '" errors="0" time="' . $total_time . '"><testsuite name="Unit" file="' . dirname($test->getFilename()) . '" fullPackage="UnderControlTests" category="QualityAssurance" package="UnderControlTests" tests="' . $test_count . '" assertions="' . $assertion_count . '" failures="' . $failure_count . '" errors="0" time="' . $total_time . '">' . "\n" . $xml . '</testsuite>
-             </testsuite>
-              </testsuites>';
     
-    $sxml = simplexml_load_string($xml);
-    return $sxml->asXml();
+    $alltests ['tests'] = $test_count;
+    $alltests ['assertions'] = $assertion_count;
+    $alltests ['failures'] = $failure_count;
+    $alltests ['errors'] = 0;
+    $alltests ['time'] = $total_time;
+    
+    return $this->xml->asXml();
   }
-
+  
+  protected function loadBaseXML()
+  {
+    $this->xml = simplexml_load_string('<?xml version="1.0" encoding="UTF-8"?>
+            <testsuites></testsuites>');
+  }
+  
+  protected function addTestSuite($name, $suite = '')
+  {
+    if (empty($suite))
+    {
+      $returnsuite = $this->xml->addChild('testsuite');
+    }
+    else
+    {
+      $returnsuite = $suite->addChild('testsuite');
+    }
+    $returnsuite ['name'] = $name;
+    return $returnsuite;
+  }
+  
+  protected function getTestSuite($name)
+  {
+    return $this->xml->xpath("//testsuite[@name='" . $name . "']'");
+  }
+  
+  protected function addTestcase($suite, $name, $value = null)
+  {
+    $returncase = $suite->addChild('testcase', $value);
+    $returncase ['name'] = $name . 'class';
+    return $returncase;
+  }
+  
+  protected function getTestcase($name)
+  {
+    return $this->xml->xpath("//testcase[@name='" . $name . "']'");
+  }
+  
+  protected function addFailure($testcase, $failure)
+  {
+    $failure = $testcase->addChild('failure', $failure);
+    $failure ['type'] = 'UnderControlFailure';
+    return $failure;
+  }
 }

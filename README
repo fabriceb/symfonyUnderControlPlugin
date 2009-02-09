@@ -55,5 +55,4 @@ There are various tutorials online on how to set up phpUnderControl, such as [th
   * Split up Functional and Unit tests into seperate Test Suites with seperate handling
   * Improve Functional Test handling
   * Improve documentation
-  * Create the output XML the proper way instead of concatenating strings
   * Allow for plugin test execution
