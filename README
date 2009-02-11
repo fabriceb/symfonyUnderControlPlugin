@@ -52,7 +52,6 @@ There are various tutorials online on how to set up phpUnderControl, such as [th
     
 ## TODO ##
 
-  * Split up Functional and Unit tests into seperate Test Suites with seperate handling
   * Improve Functional Test handling
   * Improve documentation
   * Allow for plugin test execution

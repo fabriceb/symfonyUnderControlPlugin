@@ -30,7 +30,7 @@ class SymfonyUnderControlOutput
    */
   public function setTest(SymfonyUnderControlTest $test)
   {
-    $this->tests [] = $test;
+    $this->tests [$test->getType()] [] = $test;
   }
   
   /**
@@ -63,32 +63,52 @@ class SymfonyUnderControlOutput
     $assertion_count = 0;
     $total_time = 0;
     
-    foreach ( $this->tests as $test )
+    foreach ( $this->tests as $type => $tests )
     {
-      $test_count ++;
-      $asserts = $test->getAsserts();
+      $current_suite = $this->addTestSuite($type, $alltests);
       
-      $current_suite = $this->addTestSuite($test->getName(), $alltests);
+      $type_failure = 0;
+      $type_test = 0;
+      $type_assertion = 0;
+      $type_time = 0;
       
-      $current_case = $this->addTestcase($current_suite, $test->getName());
-      $current_case ['file'] = $test->getFilename();
-      $current_case ['assertions'] = $test->getNumberOfAssertions();
-      $current_case ['time'] = $test->getTimeSpent();
-      
-      $assertion_count = $assertion_count + $test->getNumberOfAssertions();
-      $total_time = $total_time + $test->getTimeSpent();
-      
-      foreach ( $asserts as $assert_number => $assert )
+      foreach ( $tests as $test )
       {
-        if (! empty($assert_number))
+        $test_count ++;
+        $type_test ++;
+        
+        $asserts = $test->getAsserts();
+        
+        $current_case = $this->addTestcase($current_suite, $test->getName());
+        $current_case ['file'] = $test->getFilename();
+        $current_case ['assertions'] = $test->getNumberOfAssertions();
+        $current_case ['time'] = $test->getTimeSpent();
+        
+        $assertion_count = $assertion_count + $test->getNumberOfAssertions();
+        $type_assertion = $type_assertion + $test->getNumberOfAssertions();
+        $total_time = $total_time + $test->getTimeSpent();
+        $type_time = $type_time + $test->getTimeSpent();
+        
+        foreach ( $asserts as $assert_number => $assert )
         {
-          if (false === $assert ['status'])
+          if (! empty($assert_number))
           {
-            $failure_count ++;
-            $this->addFailure($current_case, $assert ['comment']);
+            if (false === $assert ['status'])
+            {
+              $failure_count ++;
+              $type_failure ++;
+              $this->addFailure($current_case, $assert ['comment']);
+            }
           }
         }
       }
+      
+      $current_suite ['tests'] = $type_test;
+      $current_suite ['assertions'] = $type_assertion;
+      $current_suite ['failures'] = $type_failure;
+      $current_suite ['errors'] = 0;
+      $current_suite ['time'] = $type_time;
+    
     }
     
     $alltests ['tests'] = $test_count;

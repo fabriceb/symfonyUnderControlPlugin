@@ -43,12 +43,20 @@ EOF;
   	$test_dir = sfConfig::get('sf_test_dir');
   	
     $finder = sfFinder::type('file')->follow_link()->name('*Test.php');
-		$tests = $finder->in($test_dir);
+		$tests = $finder->in($test_dir . '/unit');
 
 		foreach($tests as $test)
 		{
-			$test = new SymfonyUnderControlTest($test);		
-			$test->runTest($output);
+			$testObj = new SymfonyUnderControlTest($test, SymfonyUnderControlTest::TEST_UNIT);		
+			$testObj->runTest($output);
+		}
+		
+		$functests = $finder->in($test_dir . '/functional');
+		
+		foreach($functests as $functest)
+		{
+		  $testObj = new SymfonyUnderControlTest($functest, SymfonyUnderControlTest::TEST_FUNC);
+		  $testObj->runTest($output);
 		}
 		
 		$output->writeToFile();

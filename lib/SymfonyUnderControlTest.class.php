@@ -20,6 +20,9 @@ class SymfonyUnderControlTest
   const COMMENT = 6;
   const UNKNOWN = 0;
   
+  const TEST_UNIT = 'Unit';
+  const TEST_FUNC = 'Functional';
+  
   protected $filename;
   protected $php_cli;
   protected $output;
@@ -27,16 +30,18 @@ class SymfonyUnderControlTest
   protected $failed = 0;
   protected $current_assert;
   protected $time_spent;
+  protected $type;
   
   /**
    * Constructor for a test
    *
    * @param string $filename path to the file that contains the test
    */
-  public function __construct($filename)
+  public function __construct($filename, $type = self::TEST_UNIT)
   {
     $this->filename = $filename;
     $this->php_cli = $this->find_php_cli();
+    $this->type = $type;
   }
   
   /**
@@ -119,6 +124,11 @@ class SymfonyUnderControlTest
   public function getTimeSpent()
   {
   	return $this->time_spent;
+  }
+  
+  public function getType()
+  {
+    return $this->type;
   }
   
   /**
