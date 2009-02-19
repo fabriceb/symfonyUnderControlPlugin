@@ -18,6 +18,10 @@ class sfTestUnderControlTask extends sfBaseTask
     $this->addArguments(array(
       new sfCommandArgument('path', sfCommandArgument::REQUIRED, 'Output path for XML'),
     ));
+    
+    $this->addOptions(array(
+      new sfCommandOption('enable-coverage', null, sfCommandOption::PARAMETER_NONE, 'Enable code coverage metrics (requires Xdebug)'),
+    ));
     $this->namespace = 'test';
     $this->name = 'undercontrol';
     $this->briefDescription = 'Launches all tests for use with phpUnderControl';
@@ -60,5 +64,12 @@ EOF;
 		}
 		
 		$output->writeToFile();
+		
+		// code coverage support
+		if ($options['enable-coverage'])
+		{
+      $coverage = new SymfonyUnderControlCoverageOutput($this->dispatcher, $this->formatter, $this->commandApplication, $arguments['path']);
+      $coverage->writeToFile();
+		}
   }
 }
