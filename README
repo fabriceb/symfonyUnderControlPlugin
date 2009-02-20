@@ -41,7 +41,7 @@ There are various tutorials online on how to set up phpUnderControl, such as [th
             <!-- execute the test:undercontrol task and have it point to the logs directory -->
             <target name="test">
               <exec executable="${basedir}/source/trunk/symfony">
-                <arg line=" test:undercontrol ${basedir}/build/logs/undercontrol.xml" />
+                <arg line=" test:undercontrol ${basedir}/build/logs" />
               </exec>
             </target>
             // ...

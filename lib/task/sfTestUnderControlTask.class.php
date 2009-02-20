@@ -35,6 +35,8 @@ The task launches all tests found in [test/|COMMENT] and writes the output in ph
 
 If one or more test fail, you can try to fix the problem by launching
 them by hand or with the [test:unit|COMMENT] and [test:functional|COMMENT] task.
+
+Optionally, you can add the [--enable-coverage|COMMENT] option to enable code coverage analysis. This option requires the Xdebug PHP extension to be enabled.
 EOF;
   }
   
@@ -43,15 +45,18 @@ EOF;
    */
   protected function execute($arguments = array(), $options = array())
   {
-    $output = new SymfonyUnderControlOutput($arguments['path']);
+    $output = new SymfonyUnderControlTestOutput($arguments['path']);
   	$test_dir = sfConfig::get('sf_test_dir');
   	
     $finder = sfFinder::type('file')->follow_link()->name('*Test.php');
 		$tests = $finder->in($test_dir . '/unit');
 
+		$testObjects = array();
+		
 		foreach($tests as $test)
 		{
 			$testObj = new SymfonyUnderControlTest($test, SymfonyUnderControlTest::TEST_UNIT);		
+			$testObjects[] = $testObj;
 			$testObj->runTest($output);
 		}
 		
@@ -68,8 +73,13 @@ EOF;
 		// code coverage support
 		if ($options['enable-coverage'])
 		{
-      $coverage = new SymfonyUnderControlCoverageOutput($this->dispatcher, $this->formatter, $this->commandApplication, $arguments['path']);
-      $coverage->writeToFile();
+		  $coverage_output = new SymfonyUnderControlCoverageOutput($arguments['path']);
+		  foreach($testObjects as $test)
+		  {
+		    $test->runCoverage($coverage_output);
+		  }
+		  
+		  $coverage_output->writeToFile();
 		}
   }
 }
