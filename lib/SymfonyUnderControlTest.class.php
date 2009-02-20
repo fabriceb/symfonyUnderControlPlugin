@@ -50,7 +50,7 @@ class SymfonyUnderControlTest
   /**
    * Run this test
    *
-   * @param SymfonyUnderControlOutput $output
+   * @param SymfonyUnderControlTestOutput $output
    */
   public function runTest($output)
   {
@@ -68,6 +68,11 @@ class SymfonyUnderControlTest
     $this->parseTestOutput();
   }
   
+  /**
+   * Run code coverage on this test
+   *
+   * @param SymfonyUnderControlCoverageOutput $output
+   */
   public function runCoverage($output)
   {
     $output->setTest($this);
@@ -158,6 +163,11 @@ class SymfonyUnderControlTest
     return $this->type;
   }
   
+  /**
+   * Get the coverage as gotten from the code coverage check
+   *
+   * @return integer
+   */
   public function getCoverage()
   {
     return $this->coverage;
@@ -176,6 +186,10 @@ class SymfonyUnderControlTest
     }
   }
   
+  /**
+   * Parse the code coverage output of the test
+   *
+   */
   protected function parseCoverageOutput()
   {
     $parts = explode("\n", $this->output);
@@ -297,6 +311,11 @@ class SymfonyUnderControlTest
     throw new Exception("Unable to find PHP executable.");
   }
   
+  /**
+   * Get the library file path that is being tested (if existing)
+   *
+   * @return string
+   */
   protected function getLibraryFile()
   {
     $testfile = basename($this->filename);
