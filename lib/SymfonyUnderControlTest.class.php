@@ -24,6 +24,7 @@ class SymfonyUnderControlTest
   const TEST_FUNC = 'Functional';
   
   protected $filename;
+  protected $lib_file;
   protected $php_cli;
   protected $output;
   protected $coverage_output;
@@ -77,11 +78,11 @@ class SymfonyUnderControlTest
   {
     $output->setTest($this);
     
-    $lib_file = $this->getLibraryFile();
+    $this->lib_file = $this->getLibraryFile();
     // only run the test if the library file according to our logic exists
-    if (is_file($lib_file))
+    if (is_file($this->lib_file))
     {
-      $test_command = sfConfig::get('sf_root_dir') . '/symfony test:coverage ' . $this->filename . ' ' . $lib_file;
+      $test_command = sfConfig::get('sf_root_dir') . '/symfony test:coverage ' . $this->filename . ' ' . $this->lib_file;
       
       ob_start();
       passthru(sprintf('%s %s 2>&1', $this->php_cli, $test_command), $return);
@@ -171,6 +172,11 @@ class SymfonyUnderControlTest
   public function getCoverage()
   {
     return $this->coverage;
+  }
+  
+  public function getLibFile()
+  {
+    return $this->lib_file;
   }
   
   /**
