@@ -82,7 +82,7 @@ class SymfonyUnderControlTest
     // only run the test if the library file according to our logic exists
     if (is_file($this->lib_file))
     {
-      $test_command = sfConfig::get('sf_root_dir') . '/symfony test:coverage ' . $this->filename . ' ' . $this->lib_file;
+      $test_command = sfConfig::get('sf_root_dir') . '/symfony test:coverage ' . $this->getRelativePath($this->filename) . ' ' . $this->getRelativePath($this->lib_file);
       
       ob_start();
       passthru(sprintf('%s %s 2>&1', $this->php_cli, $test_command), $return);
@@ -198,7 +198,7 @@ class SymfonyUnderControlTest
    */
   protected function parseCoverageOutput()
   {
-    $parts = explode("\n", $this->output);
+    $parts = explode("\n", $this->coverage_output);
     foreach ( $parts as $part )
     {
       $test = explode(' ', $part);
@@ -331,6 +331,11 @@ class SymfonyUnderControlTest
     {
       return $result [0];
     }
+  }
+  
+  protected function getRelativePath($file)
+  {
+    return str_replace(sfConfig::get('sf_root_dir') . '/', '', $file);
   }
 
 }
