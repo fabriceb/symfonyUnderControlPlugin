@@ -227,7 +227,12 @@ class SymfonyUnderControlTest
       $this->reportFail($this->fetchAssertNumber($line));
       $this->reportComment($line);
     }
-    if ('PHP Fatal error: ' == substr($line, 0, 17))
+    if ('PropelException: ' == substr($line, 0, 17))
+    {
+      $this->reportFail($this->fetchAssertNumber($line));
+      $this->reportComment($line);
+    }
+    if ('PHP Fatal error:' == substr($line, 0, 16))
     {
       $this->reportFail($this->fetchAssertNumber($line));
       $this->reportComment($line);
