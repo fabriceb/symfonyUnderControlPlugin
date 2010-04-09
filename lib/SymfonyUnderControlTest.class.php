@@ -5,7 +5,7 @@ require_once sfConfig::get('sf_symfony_lib_dir') . '/vendor/lime/lime.php';
 
 /**
  * Class representing a single test file.
- * 
+ *
  * @package symfonyUnderControlPlugin
  * @author Stefan Koopmanschap <stefan.koopmanschap@symfony-project.com>
  *
@@ -19,10 +19,10 @@ class SymfonyUnderControlTest
   const RETURN_STATUS = 5;
   const COMMENT = 6;
   const UNKNOWN = 0;
-  
+
   const TEST_UNIT = 'Unit';
   const TEST_FUNC = 'Functional';
-  
+
   protected $filename;
   protected $lib_file;
   protected $php_cli;
@@ -35,7 +35,7 @@ class SymfonyUnderControlTest
   protected $time_spent;
   protected $type;
   protected $coverage;
-  
+
   /**
    * Constructor for a test
    *
@@ -47,7 +47,7 @@ class SymfonyUnderControlTest
     $this->php_cli = $this->find_php_cli();
     $this->type = $type;
   }
-  
+
   /**
    * Run this test
    *
@@ -56,19 +56,20 @@ class SymfonyUnderControlTest
   public function runTest($output)
   {
     $output->setTest($this);
-    
+
     ob_start();
     $time_start = microtime(true);
     passthru(sprintf('%s "%s" 2>&1', $this->php_cli, $this->filename), $return);
     $time_end = microtime(true);
     $this->output = ob_get_contents();
     ob_end_clean();
-    
+    echo $this->output;
+
     $this->time_spent = $time_end - $time_start;
-    
+
     $this->parseTestOutput();
   }
-  
+
   /**
    * Run code coverage on this test
    *
@@ -77,22 +78,22 @@ class SymfonyUnderControlTest
   public function runCoverage($output)
   {
     $output->setTest($this);
-    
+
     $this->lib_file = $this->getLibraryFile();
     // only run the test if the library file according to our logic exists
     if (is_file($this->lib_file))
     {
       $test_command = sfConfig::get('sf_root_dir') . '/symfony test:coverage ' . $this->getRelativePath($this->filename) . ' ' . $this->getRelativePath($this->lib_file);
-      
+
       ob_start();
       passthru(sprintf('%s %s 2>&1', $this->php_cli, $test_command), $return);
       $this->coverage_output = ob_get_contents();
       ob_end_clean();
-      
+
       $this->parseCoverageOutput();
     }
   }
-  
+
   /**
    * Getter for the test name
    *
@@ -101,9 +102,9 @@ class SymfonyUnderControlTest
   public function getName()
   {
     $pieces = explode('/', $this->filename);
-    return str_replace('.php', '', $pieces [count($pieces) - 1]);
+    return str_replace('.php', '', $pieces[count($pieces) - 1]);
   }
-  
+
   /**
    * Getter for the filename of this test
    *
@@ -113,7 +114,7 @@ class SymfonyUnderControlTest
   {
     return $this->filename;
   }
-  
+
   /**
    * Get the number of assertions in this test
    *
@@ -123,7 +124,7 @@ class SymfonyUnderControlTest
   {
     return count($this->asserts);
   }
-  
+
   /**
    * Get the number of failed assertions in this test
    *
@@ -133,7 +134,7 @@ class SymfonyUnderControlTest
   {
     return $this->failed;
   }
-  
+
   /**
    * Get the assertion results
    *
@@ -143,7 +144,7 @@ class SymfonyUnderControlTest
   {
     return $this->asserts;
   }
-  
+
   /**
    * Get the time spent to run the test
    *
@@ -153,7 +154,7 @@ class SymfonyUnderControlTest
   {
     return $this->time_spent;
   }
-  
+
   /**
    * Get the type of test
    *
@@ -163,7 +164,7 @@ class SymfonyUnderControlTest
   {
     return $this->type;
   }
-  
+
   /**
    * Get the coverage as gotten from the code coverage check
    *
@@ -173,12 +174,12 @@ class SymfonyUnderControlTest
   {
     return $this->coverage;
   }
-  
+
   public function getLibFile()
   {
     return $this->lib_file;
   }
-  
+
   /**
    * Parse the output of the test
    *
@@ -191,7 +192,7 @@ class SymfonyUnderControlTest
       $this->parseLine($line);
     }
   }
-  
+
   /**
    * Parse the code coverage output of the test
    *
@@ -208,7 +209,7 @@ class SymfonyUnderControlTest
       }
     }
   }
-  
+
   /**
    * Parse the specified line
    *
@@ -221,6 +222,16 @@ class SymfonyUnderControlTest
     {
       $this->reportFail($this->fetchAssertNumber($line));
     }
+    if ('Exception: ' == substr($line, 0, 11))
+    {
+      $this->reportFail($this->fetchAssertNumber($line));
+      $this->reportComment($line);
+    }
+    if ('PHP Fatal error: ' == substr($line, 0, 17))
+    {
+      $this->reportFail($this->fetchAssertNumber($line));
+      $this->reportComment($line);
+    }    
     if ('ok' == substr($line, 0, 2))
     {
       $this->reportSuccess($this->fetchAssertNumber($line));
@@ -230,7 +241,7 @@ class SymfonyUnderControlTest
       $this->reportComment($line);
     }
   }
-  
+
   /**
    * Fetch the assertion number from the given line
    *
@@ -243,7 +254,7 @@ class SymfonyUnderControlTest
     $last_space = strrpos($line, ' ');
     return (int) substr($line, $last_space + 1);
   }
-  
+
   /**
    * Report a failed test into the assertion results
    *
@@ -252,11 +263,11 @@ class SymfonyUnderControlTest
   protected function reportFail($assert_number)
   {
     $this->current_assert = $assert_number;
-    $this->asserts [$assert_number] = array();
-    $this->asserts [$assert_number] ['status'] = false;
+    $this->asserts[$assert_number] = array();
+    $this->asserts[$assert_number]['status'] = false;
     $this->failed ++;
   }
-  
+
   /**
    * Report a successful test into the assertion results
    *
@@ -265,10 +276,10 @@ class SymfonyUnderControlTest
   protected function reportSuccess($assert_number)
   {
     $this->current_assert = $assert_number;
-    $this->asserts [$assert_number] = array();
-    $this->asserts [$assert_number] ['status'] = true;
+    $this->asserts[$assert_number] = array();
+    $this->asserts[$assert_number]['status'] = true;
   }
-  
+
   /**
    * Report a comment into the assertion results when necessary
    *
@@ -278,19 +289,19 @@ class SymfonyUnderControlTest
   {
     if (! isset($this->asserts [$this->current_assert] ['comment']))
     {
-      $this->asserts [$this->current_assert] ['comment'] = $content;
+      $this->asserts[$this->current_assert]['comment'] = $content;
     }
     else
     {
-      $this->asserts [$this->current_assert] ['comment'] .= "\n" . $content;
+      $this->asserts[$this->current_assert]['comment'] .= "\n" . $content;
     }
   }
-  
+
   /**
    * Find the php CLI to use use for running the test
-   * 
+   *
    * This method has been shamelessly copied from lime
-   * 
+   *
    * @author Fabien Potencier <fabien.potencier@gmail.com>
    * @return string
    * @throws Exception
@@ -313,10 +324,10 @@ class SymfonyUnderControlTest
         }
       }
     }
-    
+
     throw new Exception("Unable to find PHP executable.");
   }
-  
+
   /**
    * Get the library file path that is being tested (if existing)
    *
@@ -332,7 +343,7 @@ class SymfonyUnderControlTest
       return $result [0];
     }
   }
-  
+
   protected function getRelativePath($file)
   {
     return str_replace(sfConfig::get('sf_root_dir') . '/', '', $file);

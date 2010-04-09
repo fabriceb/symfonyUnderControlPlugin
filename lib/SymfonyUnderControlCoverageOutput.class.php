@@ -2,12 +2,12 @@
 
 require_once(dirname(__FILE__) . '/SymfonyUnderControlOutputInterface.php');
 
-class SymfonyUnderControlCoverageOutput extends SymfonyUnderControlOutput implements SymfonyUnderControlOutputInterface 
+class SymfonyUnderControlCoverageOutput extends SymfonyUnderControlOutput implements SymfonyUnderControlOutputInterface
 {
   protected $path;
   protected $coverage_task;
   protected $output;
-  
+
   /**
    * Write the coverage results to a file
    *
@@ -26,7 +26,7 @@ class SymfonyUnderControlCoverageOutput extends SymfonyUnderControlOutput implem
                </file>';
     }
     $xml .= '</metrics>';
-    
+
     file_put_contents($this->path . '/undercontrol.coverage.xml', $xml);
   }
 }

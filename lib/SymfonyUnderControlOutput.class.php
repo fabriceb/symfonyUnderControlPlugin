@@ -2,7 +2,7 @@
 
 /**
  * Class controlling the output of the test results
- * 
+ *
  * @package symfonyUnderControlPlugin
  * @author Stefan Koopmanschap <stefan.koopmanschap@symfony-project.com>
  *
@@ -12,7 +12,7 @@ class SymfonyUnderControlOutput
   protected $tests = array();
   protected $path;
   protected $xml;
-  
+
   /**
    * Constructor
    *
@@ -22,7 +22,7 @@ class SymfonyUnderControlOutput
   {
     $this->path = $path;
   }
-  
+
   /**
    * Set the current test and add it to the list of tests
    *
@@ -32,6 +32,5 @@ class SymfonyUnderControlOutput
   {
     $this->tests [$test->getType()] [] = $test;
   }
-  
 
 }
