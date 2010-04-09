@@ -17,8 +17,6 @@ function run_phpunit_tests($task, $args)
   $finder = sfFinder::type('file')->follow_link()->name('*Test.php');
   $tests = $finder->in($test_dir . '/unit');
 
-  $tests=array();
-
   $testObjects = array();
 
   foreach($tests as $test)
@@ -29,8 +27,6 @@ function run_phpunit_tests($task, $args)
   }
 
   $functests = $finder->in($test_dir . '/functional');
-
-  $functests = array('/allomatch/htdocs/branches/dev/test/functional/iphone/matchActionsTest.php');
 
   foreach($functests as $functest)
   {
