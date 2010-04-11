@@ -205,7 +205,7 @@ class SymfonyUnderControlTest
       $test = explode(' ', $part);
       if (strpos($test [0], '.class'))
       {
-        $this->coverage = str_replace('%', '', $test [count($test) - 1]);
+        $this->coverage = str_replace('%', '', $test[count($test) - 1]);
       }
     }
   }
@@ -218,28 +218,23 @@ class SymfonyUnderControlTest
   protected function parseLine($line)
   {
     $line = trim($line);
-    if ('not ok' == substr($line, 0, 6))
-    {
-      $this->reportFail($this->fetchAssertNumber($line));
-    }
-    if ('Exception: ' == substr($line, 0, 11))
-    {
-      $this->reportFail($this->fetchAssertNumber($line));
-      $this->reportComment($line);
-    }
-    if ('PropelException: ' == substr($line, 0, 17))
-    {
-      $this->reportFail($this->fetchAssertNumber($line));
-      $this->reportComment($line);
-    }
     if ('PHP Fatal error:' == substr($line, 0, 16))
     {
-      $this->reportFail($this->fetchAssertNumber($line));
+      $this->reportFail();
       $this->reportComment($line);
-    }    
+    }
+    if ('PHP Warning:' == substr($line, 0, 12))
+    {
+      $this->reportFail();
+      $this->reportComment($line);
+    }
+    if ('not ok' == substr($line, 0, 6))
+    {
+      $this->reportFail();
+    }
     if ('ok' == substr($line, 0, 2))
     {
-      $this->reportSuccess($this->fetchAssertNumber($line));
+      $this->reportSuccess();
     }
     if ('#' == substr($line, 0, 1))
     {
@@ -247,30 +242,18 @@ class SymfonyUnderControlTest
     }
   }
 
-  /**
-   * Fetch the assertion number from the given line
-   *
-   * @param string $line
-   * @return integer
-   */
-  protected function fetchAssertNumber($line)
-  {
-    $line = trim($line);
-    $last_space = strrpos($line, ' ');
-    return (int) substr($line, $last_space + 1);
-  }
 
   /**
    * Report a failed test into the assertion results
    *
    * @param integer $assert_number
    */
-  protected function reportFail($assert_number)
+  protected function reportFail()
   {
-    $this->current_assert = $assert_number;
-    $this->asserts[$assert_number] = array();
-    $this->asserts[$assert_number]['status'] = false;
-    $this->failed ++;
+    $this->current_assert++;
+    $this->asserts[$this->current_assert] = array();
+    $this->asserts[$this->current_assert]['status'] = false;
+    $this->failed++;
   }
 
   /**
@@ -278,11 +261,11 @@ class SymfonyUnderControlTest
    *
    * @param integer $assert_number
    */
-  protected function reportSuccess($assert_number)
+  protected function reportSuccess()
   {
-    $this->current_assert = $assert_number;
-    $this->asserts[$assert_number] = array();
-    $this->asserts[$assert_number]['status'] = true;
+    $this->current_assert++;
+    $this->asserts[$this->current_assert] = array();
+    $this->asserts[$this->current_assert]['status'] = true;
   }
 
   /**
@@ -292,7 +275,7 @@ class SymfonyUnderControlTest
    */
   protected function reportComment($content)
   {
-    if (! isset($this->asserts [$this->current_assert] ['comment']))
+    if (! isset($this->asserts[$this->current_assert] ['comment']))
     {
       $this->asserts[$this->current_assert]['comment'] = $content;
     }
