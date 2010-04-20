@@ -23,8 +23,20 @@ There are various tutorials online on how to set up phpUnderControl, such as [th
   * Install the plugin
     
         ./symfony plugin:install symfonyUnderControlPlugin --release=0.0.1
+
+  * standard Configuration
+    * Enable the plugin 'symfonyUnderControlPlugin' in your config/ProjectConfiguration.class.php file
+    * ./symfony test:undercontrol PATH to run all the tests and save the output in PATH/undercontrol.xml
+
+  * Hudson integration
+    * Install "Hudson xUnit plugin"
+    * In your Hudson project configuration :
+      * Add an "Execute shell" build step : "./symfony test:undercontrol `pwd`"
+      * Check "Publish testing tools result report"
+      * Add a PHPUnit
+      * Put "undercontrol.xml" as PHPUnit Pattern
     
-  * Configure your project in phpUnderControl
+  * phpUnderControl integration
     * Create a new project in your project directory by either using phpuc.php project or creating the structure yourself
     * Configure your project's build.xml to use symfonyUnderControl   
       
